@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <title>多媒体展示平台</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.7.5/css/foundation.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f5f7fa;
+    }
+    .sidebar {
+      width: 200px;
+      background: #2c3e50;
+      padding: 20px 0;
+      color: white;
+    }
+    .menu-button {
+      display: block;
+      width: 100%;
+      padding: 12px 20px;
+      margin: 5px 0;
+      text-align: left;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .menu-button:hover, .menu-button.active {
+      background: #34495e;
+    }
+    .menu-button i {
+      margin-right: 10px;
+    }
+    .content-area {
+      flex: 1;
+      padding: 20px;
+      background: white;
+    }
+    .media-container {
+      margin-top: 20px;
+      min-height: 500px;
+      border: 1px dashed #eee;
+      padding: 20px;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        display: flex;
+        padding: 10px;
+      }
+      .menu-button {
+        padding: 10px;
+        text-align: center;
+      }
+      .menu-button span {
+        display: none;
+      }
+      .menu-button i {
+        margin: 0;
+        font-size: 1.2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <button class="menu-button active" onclick="fetchHotImage1()">
+      <i class="fas fa-image"></i>
+      <span>热门图片1</span>
+    </button>
+    <button class="menu-button active" onclick="fetchHotImage2()">
+      <i class="fas fa-image"></i>
+      <span>热门图片2</span>
+    </button>
+    <button class="menu-button" onclick="fetchBeautyVideo()">
+      <i class="fas fa-video"></i>
+      <span>美女视频</span>
+    </button>
+  </div>
+
+  <div class="content-area">
+    <div class="media-container">
+      <div id="loading">正在加载热门图片...</div>
+      <div id="image-container"></div>
+      <div id="video-container"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      fetchHotImage();
+    });
+
+    function setActiveButton(button) {
+      $('.menu-button').removeClass('active');
+      $(button).addClass('active');
+    }
+
+    function fetchHotImage1() {
+      setActiveButton(event.target);
+      showLoading('正在加载热门图片...');
+      
+      $.ajax({
+        url: 'https://v2.xxapi.cn/api/hot60s',
+        method: 'GET',
+        success: function(data) {
+          if (data.code === 200) {
+            $('#image-container').html('<img src="' + data.data + '" alt="今日热门" style="max-width:100%;">');
+            $('#video-container').empty();
+          } else {
+            showError('图片加载失败: ' + data.msg);
+          }
+        },
+        error: showAjaxError,
+        complete: hideLoading
+      });
+    }
+
+    function fetchHotImage2() {
+      setActiveButton(event.target);
+      showLoading('正在加载热门图片...');
+      
+      $.ajax({
+        url: 'https://60api.09cdn.xyz/v2/60s',
+        method: 'GET',
+        success: function(data) {
+          if (data.code === 200) {
+            $('#image-container').html('<img src="' + data.image + '" alt="今日热门" style="max-width:100%;">');
+            $('#video-container').empty();
+          } else {
+            showError('图片加载失败: ' + data.msg);
+          }
+        },
+        error: showAjaxError,
+        complete: hideLoading
+      });
+    }
+
+
+    function fetchBeautyVideo() {
+      setActiveButton(event.target);
+      showLoading('正在加载视频内容...');
+      
+      $.ajax({
+        url: 'https://v2.xxapi.cn/api/meinv',
+        method: 'GET',
+        success: function(data) {
+          if (data.code === 200) {
+            $('#video-container').html(
+              '<video src="' + data.data + '" controls autoplay style="max-width:100%;height:600px"></video>'
+            );
+            $('#image-container').empty();
+          } else {
+            showError('视频加载失败: ' + data.msg);
+          }
+        },
+        error: showAjaxError,
+        complete: hideLoading
+      });
+    }
+
+    function showLoading(msg) {
+      $('#loading').text(msg).show();
+    }
+
+    function hideLoading() {
+      $('#loading').hide();
+    }
+
+    function showAjaxError(xhr) {
+      showError('请求失败: ' + (xhr.responseJSON?.msg || xhr.statusText));
+    }
+
+    function showError(msg) {
+      alert(msg);
+      console.error(msg);
+    }
+  </script>
+</body>
+</html>
