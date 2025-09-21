@@ -1,0 +1,43 @@
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://www.zhangxinxu.com/study/js/mini/jquery.scrollLoading-min.js"></script>
+<link rel="stylesheet" href="https://www.zhangxinxu.com/study/css/common.css" type="text/css" />
+<style>
+.zxx_test_list{font-size:13px;}
+.zxx_test_list img{margin-bottom:5px;}
+
+.zxx_main_con {
+	height: 600px;
+	overflow: auto;
+}
+</style>
+
+<script>
+	$(".scrollLoading").scrollLoading();
+	var dizhi = "https://ebook.chinabuilding.com.cn/upload/resources/pdf/20240111/150239725/bg";
+	//var dizhi = "https://ebook.chinabuilding.com.cn/upload/resources/pdf/20240111/150239725/23J909";
+	page = 442
+	for (var i = 1; i < page + 1; i++) {
+		var x = "";
+		//x = x + '<div id="pf' + i.toString(16) +'" class="pf w0 h0" data-page-no="' + i +'" data-page-url="'+ dizhi + i.toString(16) +'.page"></div>'
+		//x = x +'<img class="scrollLoading" id="pf' + i.toString(16) +'"  data-url="'+ dizhi + i.toString(16) +'.jpg" src="pdf2htmlEX-64x64.png" width="180" height="180" style="background:url(pdf2htmlEX-64x64.png) no-repeat center;">'
+		//x = x +'<div id="pf' + i.toString(16) +'" class="pf w0 h0" data-page-no="' + i +'" data-page-url="'+ dizhi + i.toString(16) +'.jpg"></div>'
+		x = x +'<div class="zxx_test_list scrollLoading" data-url="'+ dizhi + i.toString(16) +'.jpg"><div style="padding:100px 0; text-align:center;"><img src="pdf2htmlEX-64x64.png" style="margin:0 8px -8px 0;" />加载中...</div></div>';
+		document.write(x);
+	}
+</script>
+<div style="position:absolute; left:-6000px; top:-6000px;">
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-11205167-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+	var ga = document.createElement('script');
+	 ga.type = 'text/javascript';
+	 ga.async = true;
+	ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+	var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</div>
