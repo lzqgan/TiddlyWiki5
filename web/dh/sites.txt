@@ -1,20 +1,130 @@
+# 常用网站
+    tiddlystow,https://btheado.github.io/tiddlystow/
+    126邮箱,https://www.126.com
+    福利吧, https://fuliba2023.net/
+    福利吧论坛, https://www.wnflb00.com/plugin.php?id=rank_7ree:rank_7ree&code=1&fid_7ree=0
+    福利吧导航, https://fuliba123.com/
+    flomo · 浮墨笔记, https://flomoapp.com/
+    Inoreader, https://www.innoreader.com/login?sendback=%2Fall_articles
+    微信读书, https://weread.qq.com/
+    Telegram, https://web.telegram.org/a/
+    115科技官网, https://115.com/
+# AI
+    豆包, https://www.doubao.com/
+    DeepSeek, https://www.deepseek.com/
+    ChatGPT, https://chatgpt.com/
+    TRAE, https://www.trae.cn/plugin
+
+# 导航
+        Pintree, http://lzqgan.web3v.vip/daohang/index.html
+        Pintree, https://lzqdh.netlify.app/
+
+## 我的空间
+        TiddlyWiki, https://lzqgan.github.io/TiddlyWiki5/
+        TiddlyWiki, https://app.koofr.net/dav/Koofr/wiki/soft.aspx
+        TiddlyWiki找不到站点, https://lzqtw.netlify.app/
+        DokuWiki, https://duwiki.22web.org/doku.php?id=start&i=1
+        Memos, https://d0d0d42f-d543-4735-b660-773774ef8a55-00-1884hd9x19s2d.pike.replit.dev/
+        神奇的docsify, https://lzqblog.22web.org/#/
+        神奇的docsify, http://lzqbolg.3vzhuji.cc/#/
+
+# 建筑设计
+## 设计规范
+    中国建筑标准设计网, https://www.chinabuilding.com.cn/shtml/bookslist-1-2.html
+    搜建筑网, https://www.soujianzhu.cn/
+    工标网, http://www.csres.com/
+    消防资源网, https://1190119.com/
+    国标电子书库, https://ebook.chinabuilding.com.cn/zbooklib/sublibBook/resultlist?SiteID=1&sublibID=2202&sortType=Default&abolish=2&indexInfor=&viewType=imgView
+    标准规范库, https://ifnmxq.smartapps.baidu.com/?_chatQuery=%E5%9B%B4%E5%A2%99%E5%A4%A7%E9%97%A8%2B15J001&searchid=e6c18a150091945e&_chatParams=%7B%22agent_id%22%3A%227dd9a%22%2C%22content_build_id%22%3A%221d5e22d2%22%2C%22from%22%3A%22q2c%22%2C%22token%22%3A%22aXZ3K1RxU3lsTUVPalZZend0S3FkSEt3Wm1VVldTalhrcVBYaTA3d29pQko2NVBkdlI0RkNQeTZwcFJ1QWVBZ0JzbXR3Q2gwcXk3b2ZpNkhobFNYRGUwUEo1RFExOE55dm51bjgrMnFsRnpUQTVPUWZpUlgxelRpMG51ODBEMGM%3D%22%2C%22chat_no_login%22%3Atrue%7D&_swebScene=3711000610001000
+    国家标准全文公开, https://openstd.samr.gov.cn/bzgk/gb/index
+    建标库, http://www.jianbiaoku.com/webarbs/list/117/1.shtml
+
+## 效果参考
+    花瓣网, https://huaban.com/
+    千库网, https://588ku.com/image/shejishisucai.html
+    Pinterest, https://jp.pinterest.com/
+    别墅工场, https://www.bieshugc.com/
+
+## 政策
+    通知公告 - 湖南省住房和城乡建设厅, https://zjt.hunan.gov.cn/zjt/xxgk/xinxigongkaimulu/tzgg/index.html
+    中华人民共和国住房和城乡建设部, https://www.mohurd.gov.cn/gongkai/fdzdgknr/bzgg/index.html
+    湖南省 施工图设计文件 审查要点 site: zjt.hunan.gov.cn_百度搜索, https://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=1&ch=&tn=baidu&bar=&wd=%E6%B9%96%E5%8D%97%E7%9C%81+%E6%96%BD%E5%B7%A5%E5%9B%BE%E8%AE%BE%E8%AE%A1%E6%96%87%E4%BB%B6+%E5%AE%A1%E6%9F%A5%E8%A6%81%E7%82%B9+site%3A+zjt.hunan.gov.cn&oq=%25E6%25B9%2596%25E5%258D%2597%25E7%259C%2581%2520%25E6%2596%25BD%25E5%25B7%25A5%25E5%259B%25BE%25E8%25AE%25BE%25E8%25AE%25A1%25E6%2596%2587%25E4%25BB%25B6%25E5%25AE%25A1%25E6%259F%25A5%25E8%25A6%2581%25E7%2582%25B9%2520site%253A%2520zjt.hunan.gov.cn&rsv_pq=94c7d55b00035431&rsv_t=27aanbJbPZ%2FvZHoM4AC8NuR68Saq8APpm2c6%2BYyr%2FeH0QSjdUCE72nOWntc&rqlang=cn&rsv_enter=0&rsv_btype=t&rsv_dl=tb&inputT=805
+    湖南省施工图管理信息系统, http://218.77.58.140:8380/login
+
+## 建筑招聘
+    建筑英才网, https://www.buildhr.com/so/kw%E5%BB%BA%E7%AD%91%E8%AE%BE%E8%AE%A1-11-2801,2809-fn111100.html?
+    建筑人才网, http://www.buildjob.net/
+    前程无忧, https://we.51job.com/pc/search?searchType=2&function=6905&jobArea=190200&sortType=0&pageNum=1&functionValue=%E5%BB%BA%E7%AD%91%E8%AE%BE%E8%AE%A1%E5%B8%88
+    一览, https://www.sjjob88.com/warning.htm
+    湖南人才网, https://www.hnrcsc.com/#/
+    智联招聘, https://www.zhaopin.com/sou/jl757/kwBRT7MKCBNQ5Q2/p1
+    益阳直聘, https://yy.hnzp168.com/
+
+
 # 搜索引擎
-谷歌,https://google.com
+    谷歌,https://google.com
 
 ## 中文搜索
-百度,baidu.com
-搜狗,sogou.com
+    百度,baidu.com
+    搜狗,sogou.com
 
 # 社交网络
 ## 国内社交
-微信,https://weixin.qq.com
-微博,weibo.com
+    微信,https://weixin.qq.com
+    微博,weibo.com
 
 ## 国际社交
-Facebook,facebook.com
-Twitter,twitter.com
+    Facebook,facebook.com
+    Twitter,twitter.com
+
+# 影视网站
+        豆瓣电影, https://movie.douban.com/
+        ♥OK资源采集-最新影视资源大全-_笔点网址导航, https://www.bidianer.com/site/186360
+        APP影院-全网最全视频库, https://www.appmovie.click/
+        界影视, https://www.hkybqufgh.com/type/1
+## 磁力下载
+## 影视资源库
+## 我的站点
+        LibreTV - 公用1, https://libre-tv-brown-three.vercel.app/
+        LibreTV - 公用2，畅享精彩, https://libretv.is-an.org/
+        moontv -lzq, https://lzqmoontv.netlify.app/
+        LibreTV - lzq, https://lzqlibitv.netlify.app/
+
+
+
+#番号世界
+## 免翻网站
+        javclass, https://javclass.com/ 
+## 数据库
+        JavDB, https://javdb.com/
+        Xslist, https://xslist.org/zh
+        东京图书馆, https://tokyolib.com/
+        JavBus, https://www.javbus.com/
+        ## 日本在线
+        nJAV, https://njav.gl/zh/
+        Jable, https://jable.one/
+        EPORNER, https://pt.eporner.com/
+        JAVDOCK, https://www4.javdock.com/
+        瘋AV, https://airav.io/
+        bad.news, https://bad.news/
+        JavTREE, https://javtree.com/
+        xHamster, https://vi.xhamster2.com/
+        午夜AV, https://www.wyav.tv/
+        小鸭看看, https://xiaoyakankan.com/
+        JAV HD, https://javhd.name/
+        JAVIDEO, https://javideo.net/en/
+        javleak, https://javleak.com/
+        JAVSB, https://jav.sb/
+        HoHoJ, https://hohoj.tv/
+        G點網, https://gdav.com/
+        sextb, https://sextb.net/
+        傻傻视频1, https://www.uweitao.com/
+
+## 欧美在线
+
+## 番号资源库
 
 # 我的工具
-html演示,../tool/html代码直接演示.html
-链接转换,../tool/链接转换.html
-文本框复制,../tool/文本框复制.html
+    html演示,../tool/html代码直接演示.html
+    链接转换,../tool/链接转换.html
+    文本框复制,../tool/文本框复制.html
