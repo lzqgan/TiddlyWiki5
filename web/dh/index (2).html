@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址导航</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .category-active {
+                @apply bg-primary text-white;
+            }
+            .site-card-hover {
+                @apply transition-all duration-300 hover:shadow-md hover:-translate-y-1;
+            }
+        }
+    </style>
+    
+    <!-- 引入字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-inter text-dark min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-gradient-to-r from-primary to-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fa fa-compass text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold">网址导航</h1>
+                </div>
+                
+                <!-- 搜索框 -->
+                <div class="w-full md:w-1/3 relative">
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        placeholder="搜索网站..." 
+                        class="w-full py-2 px-4 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-800"
+                    >
+                    <i class="fa fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主内容区 - 左侧分类，右侧网址 -->
+    <main class="container mx-auto px-4 py-6 flex-grow flex flex-col md:flex-row gap-6">
+        <!-- 左侧分类导航 -->
+        <div class="w-full md:w-64 lg:w-72 shrink-0">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden sticky top-4">
+                <div class="p-4 border-b border-gray-100">
+                    <h2 class="font-bold text-lg flex items-center">
+                        <i class="fa fa-th-list text-primary mr-2"></i>分类导航
+                    </h2>
+                </div>
+                
+                <div id="categories-list" class="max-h-[calc(100vh-180px)] overflow-y-auto">
+                    <!-- 分类将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧网址内容区 -->
+        <div class="flex-grow">
+            <!-- 状态提示 -->
+            <div id="status-message" class="hidden mb-6 p-4 rounded-lg bg-blue-50 text-blue-800 border border-blue-200">
+                <i class="fa fa-info-circle mr-2"></i>
+                <span id="status-text">加载中...</span>
+            </div>
+            
+            <!-- 当前分类标题 -->
+            <div id="current-category" class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-800"></h2>
+                <p class="text-gray-500" id="site-count"></p>
+            </div>
+            
+            <!-- 网址列表 -->
+            <div id="sites-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- 内容将通过JavaScript动态生成 -->
+            </div>
+            
+            <!-- 加载中动画 -->
+            <div id="loading" class="flex justify-center items-center py-16">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+            </div>
+            
+            <!-- 空状态 -->
+            <div id="empty-state" class="hidden flex flex-col py-20 items-center justify-center">
+                <div class="text-center">
+                    <i class="fa fa-folder-open-o text-5xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">没有找到任何网站数据</p>
+                </div>
+            </div>
+            
+            <!-- 搜索无结果 -->
+            <div id="no-results" class="hidden flex justify-center py-20">
+                <p class="text-gray-500">没有找到匹配的网站</p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2023 网址导航 | 数据来源于 sites.txt</p>
+            <p class="text-sm text-gray-400 mt-2">使用 Tailwind CSS 构建</p>
+        </div>
+    </footer>
+    
+    <script>
+        // 存储所有网站数据
+        let allSites = {};
+        let filteredSites = {};
+        let currentActiveCategory = '';
+        
+        // DOM 加载完成后执行
+        document.addEventListener('DOMContentLoaded', () => {
+            // 读取并解析txt文件
+            loadSitesFromFile('sites.txt');
+            
+            // 搜索功能
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', handleSearch);
+        });
+        
+        // 从txt文件加载网站数据
+        function loadSitesFromFile(filePath) {
+            showStatus('正在读取网站数据...');
+            
+            fetch(filePath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('文件未找到或无法加载');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    parseSitesData(data);
+                    renderCategories();
+                    
+                    // 默认显示第一个分类
+                    const firstCategory = Object.keys(allSites)[0];
+                    if (firstCategory) {
+                        showCategorySites(firstCategory);
+                    }
+                    
+                    hideLoading();
+                    hideStatus();
+                })
+                .catch(error => {
+                    console.error('加载文件出错:', error);
+                    hideLoading();
+                    showStatus('无法加载数据: ' + error.message, 'error');
+                    showEmptyState();
+                });
+        }
+        
+        // 解析网站数据
+        function parseSitesData(data) {
+            const lines = data.split('\n');
+            let currentCategory = '未分类';
+            
+            lines.forEach(line => {
+                // 去除首尾空白
+                line = line.trim();
+                
+                // 跳过空行
+                if (line === '') return;
+                
+                // 处理分类行 (以#开头)
+                if (line.startsWith('#')) {
+                    currentCategory = line.substring(1).trim();
+                    // 初始化分类
+                    if (!allSites[currentCategory]) {
+                        allSites[currentCategory] = [];
+                    }
+                } else {
+                    // 处理网站行 (格式: 网站名,网址)
+                    const [name, url] = line.split(',').map(item => item.trim());
+                    if (name && url) {
+                        // 确保URL格式正确
+                        const formattedUrl = url.startsWith('http://') || url.startsWith('https://') 
+                            ? url 
+                            : 'https://' + url;
+                            
+                        if (!allSites[currentCategory]) {
+                            allSites[currentCategory] = [];
+                        }
+                        
+                        allSites[currentCategory].push({
+                            name,
+                            url: formattedUrl
+                        });
+                    }
+                }
+            });
+            
+            // 如果没有数据，显示空状态
+            if (Object.keys(allSites).length === 0) {
+                showEmptyState();
+            }
+        }
+        
+        // 渲染左侧分类列表
+        function renderCategories() {
+            const container = document.getElementById('categories-list');
+            container.innerHTML = '';
+            
+            // 遍历每个分类
+            Object.keys(allSites).forEach(category => {
+                const categoryItem = document.createElement('button');
+                categoryItem.className = 'w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex items-center justify-between';
+                categoryItem.innerHTML = `
+                    <span class="flex items-center">
+                        <i class="fa fa-folder text-primary mr-2"></i>${category}
+                    </span>
+                    <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">${allSites[category].length}</span>
+                `;
+                
+                // 点击分类切换显示
+                categoryItem.addEventListener('click', () => {
+                    showCategorySites(category);
+                });
+                
+                container.appendChild(categoryItem);
+            });
+        }
+        
+        // 显示指定分类的网站
+        function showCategorySites(category) {
+            // 更新当前活跃分类样式
+            updateActiveCategoryStyle(category);
+            
+            // 更新当前分类标题
+            document.getElementById('current-category').querySelector('h2').textContent = category;
+            document.getElementById('site-count').textContent = `共 ${allSites[category].length} 个网站`;
+            
+            // 渲染网站列表
+            const container = document.getElementById('sites-container');
+            container.innerHTML = '';
+            
+            // 获取当前分类的网站（考虑搜索过滤）
+            const sites = filteredSites[category] || allSites[category];
+            
+            if (sites && sites.length > 0) {
+                sites.forEach(site => {
+                    const siteCard = document.createElement('a');
+                    siteCard.href = site.url;
+                    siteCard.target = '_blank';
+                    siteCard.className = 'bg-white rounded-lg shadow-sm p-4 border border-gray-100 site-card-hover flex flex-col h-full';
+                    
+                    // 提取域名作为辅助信息
+                    let domain = '';
+                    try {
+                        domain = new URL(site.url).hostname.replace('www.', '');
+                    } catch (e) {
+                        domain = site.url;
+                    }
+                    
+                    siteCard.innerHTML = `
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="font-medium text-gray-800">${site.name}</h3>
+                            <i class="fa fa-external-link text-gray-400 hover:text-primary transition-colors"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-auto truncate">${domain}</p>
+                    `;
+                    
+                    container.appendChild(siteCard);
+                });
+            } else {
+                container.innerHTML = `
+                    <div class="col-span-full flex justify-center py-12 text-gray-500">
+                        <p>该分类下没有网站数据</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // 更新活跃分类的样式
+        function updateActiveCategoryStyle(category) {
+            // 移除之前的活跃状态
+            if (currentActiveCategory) {
+                const prevActive = document.querySelectorAll('#categories-list button')[
+                    Object.keys(allSites).indexOf(currentActiveCategory)
+                ];
+                if (prevActive) {
+                    prevActive.classList.remove('category-active');
+                    prevActive.classList.add('hover:bg-gray-50');
+                }
+            }
+            
+            // 设置新的活跃状态
+            currentActiveCategory = category;
+            const currentActive = document.querySelectorAll('#categories-list button')[
+                Object.keys(allSites).indexOf(category)
+            ];
+            if (currentActive) {
+                currentActive.classList.add('category-active');
+                currentActive.classList.remove('hover:bg-gray-50');
+                
+                // 滚动到当前分类（如果在视口外）
+                currentActive.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+        
+        // 处理搜索功能
+        function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            // 如果搜索为空，显示所有网站
+            if (searchTerm === '') {
+                filteredSites = {};
+                // 重新显示当前活跃分类
+                if (currentActiveCategory) {
+                    showCategorySites(currentActiveCategory);
+                }
+                // 恢复分类计数
+                renderCategories();
+                return;
+            }
+            
+            // 过滤网站
+            filteredSites = {};
+            
+            Object.keys(allSites).forEach(category => {
+                const matchingSites = allSites[category].filter(site => 
+                    site.name.toLowerCase().includes(searchTerm) || 
+                    site.url.toLowerCase().includes(searchTerm)
+                );
+                
+                if (matchingSites.length > 0) {
+                    filteredSites[category] = matchingSites;
+                }
+            });
+            
+            // 更新分类计数
+            renderCategories();
+            
+            // 如果当前活跃分类在过滤结果中，显示它；否则显示第一个过滤结果
+            if (filteredSites[currentActiveCategory]) {
+                showCategorySites(currentActiveCategory);
+            } else {
+                const firstFilteredCategory = Object.keys(filteredSites)[0];
+                if (firstFilteredCategory) {
+                    showCategorySites(firstFilteredCategory);
+                } else {
+                    // 没有匹配结果
+                    document.getElementById('sites-container').innerHTML = '';
+                    document.getElementById('current-category').querySelector('h2').textContent = '';
+                    document.getElementById('site-count').textContent = '';
+                    showNoResults();
+                }
+            }
+        }
+        
+        // 显示状态消息
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status-message');
+            
+            // 设置状态样式和内容
+            if (type === 'error') {
+                statusEl.className = 'mb-6 p-4 rounded-lg bg-red-50 text-red-800 border border-red-200';
+                statusEl.innerHTML = `<i class="fa fa-exclamation-circle mr-2"></i><span>${message}</span>`;
+            } else {
+                statusEl.className = 'mb-6 p-4 rounded-lg bg-blue-50 text-blue-800 border border-blue-200';
+                statusEl.innerHTML = `<i class="fa fa-info-circle mr-2"></i><span>${message}</span>`;
+            }
+            
+            statusEl.classList.remove('hidden');
+        }
+        
+        // 隐藏状态消息
+        function hideStatus() {
+            document.getElementById('status-message').classList.add('hidden');
+        }
+        
+        // 隐藏加载动画
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+        
+        // 显示空状态
+        function showEmptyState() {
+            document.getElementById('empty-state').classList.remove('hidden');
+            document.getElementById('categories-list').classList.add('hidden');
+        }
+        
+        // 显示无结果状态
+        function showNoResults() {
+            document.getElementById('no-results').classList.remove('hidden');
+        }
+        
+        // 隐藏无结果状态
+        function hideNoResults() {
+            document.getElementById('no-results').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络TXT导航工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        neutral: '#F5F7FA',
+                        dark: '#1D2129',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .category-active {
+                @apply bg-primary/10 text-primary border-l-4 border-primary;
+            }
+        }
+    </style>
+</head>
+<body class="bg-neutral min-h-screen font-sans text-dark">
+    <div class="container mx-auto px-4 py-6 max-w-7xl">
+        <header class="mb-6">
+            <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-dark flex items-center">
+                <i class="fa fa-compass text-primary mr-3"></i>
+                网络TXT导航工具
+            </h1>
+            <p class="text-gray-500 mt-1">输入TXT文件的网络地址，自动解析分类和网站链接</p>
+        </header>
+
+        <!-- 输入区域 -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6 transition-all duration-300 hover:shadow-md">
+            <div class="flex flex-col md:flex-row gap-3">
+                <input 
+                    type="url" 
+                    id="txtUrl" 
+                    placeholder="请输入TXT文件的网络地址（例如：https://example.com/nav.txt）" 
+                    class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
+                    value="https://raw.githubusercontent.com/lecepin/Test/main/nav.txt"
+                >
+                <button 
+                    id="loadBtn" 
+                    class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 font-medium"
+                >
+                    <i class="fa fa-download"></i>
+                    <span>加载导航</span>
+                </button>
+            </div>
+            <div class="mt-3 text-sm text-gray-500">
+                <p><i class="fa fa-info-circle text-primary mr-1"></i> TXT格式要求：#开头为分类，其他行需符合"网站名,网址"格式</p>
+            </div>
+        </div>
+
+        <!-- 错误提示 -->
+        <div id="errorMsg" class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg mb-6 hidden">
+            <i class="fa fa-exclamation-circle mr-2"></i>
+            <span id="errorText"></span>
+        </div>
+
+        <!-- 加载状态 -->
+        <div id="loading" class="flex items-center justify-center py-10 mb-6 hidden">
+            <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
+            <span class="ml-3 text-gray-600">正在加载导航数据...</span>
+        </div>
+
+        <!-- 导航内容区域 - 左右分栏 -->
+        <div id="navContainer" class="flex flex-col lg:flex-row gap-6 hidden">
+            <!-- 左侧分类 -->
+            <div class="lg:w-1/4 bg-white rounded-lg shadow-sm p-4 h-[calc(100vh-240px)] overflow-y-auto scrollbar-hide">
+                <h2 class="font-semibold text-lg mb-4 pb-2 border-b border-gray-100">
+                    <i class="fa fa-folder-open text-primary mr-2"></i>分类列表
+                </h2>
+                <ul id="categoryList" class="space-y-1">
+                    <!-- 分类将通过JS动态生成 -->
+                </ul>
+            </div>
+
+            <!-- 右侧网站列表 -->
+            <div class="lg:w-3/4 bg-white rounded-lg shadow-sm p-4 h-[calc(100vh-240px)] overflow-y-auto scrollbar-hide">
+                <div id="siteListContainer" class="min-h-full flex flex-col">
+                    <div class="text-center py-10 text-gray-400 flex flex-col items-center justify-center flex-1">
+                        <i class="fa fa-hand-pointer-o text-4xl mb-3"></i>
+                        <p>请从左侧选择一个分类</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const txtUrl = document.getElementById('txtUrl');
+        const loadBtn = document.getElementById('loadBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const errorText = document.getElementById('errorText');
+        const loading = document.getElementById('loading');
+        const navContainer = document.getElementById('navContainer');
+        const categoryList = document.getElementById('categoryList');
+        const siteListContainer = document.getElementById('siteListContainer');
+        
+        // 存储导航数据
+        let navigationData = {};
+        let currentCategory = '';
+
+        // 加载按钮点击事件
+        loadBtn.addEventListener('click', () => {
+            const url = txtUrl.value.trim();
+            if (!url) {
+                showError('请输入TXT文件的网络地址');
+                return;
+            }
+            
+            loadNavigationFromUrl(url);
+        });
+
+        // 回车键触发加载
+        txtUrl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loadBtn.click();
+            }
+        });
+
+        // 从网络加载TXT文件
+        async function loadNavigationFromUrl(url) {
+            try {
+                showLoading();
+                hideError();
+                
+                // 发起请求获取TXT内容
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`请求失败，状态码: ${response.status}`);
+                }
+                
+                const content = await response.text();
+                navigationData = parseNavigation(content);
+                
+                // 渲染分类列表
+                renderCategories();
+                
+                // 显示导航容器
+                navContainer.classList.remove('hidden');
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                showError(`加载失败: ${error.message}`);
+                console.error('加载错误:', error);
+            }
+        }
+
+        // 解析TXT内容为分类和链接
+        function parseNavigation(content) {
+            const lines = content.split('\n');
+            const navigationData = {};
+            let currentCategory = '未分类'; // 默认分类
+
+            lines.forEach((line, index) => {
+                const trimmedLine = line.trim();
+                // 跳过空行
+                if (!trimmedLine) return;
+
+                // 处理分类行（#开头）
+                if (trimmedLine.startsWith('#')) {
+                    currentCategory = trimmedLine.replace(/^#+/, '').trim();
+                    // 初始化分类数组
+                    if (!navigationData[currentCategory]) {
+                        navigationData[currentCategory] = [];
+                    }
+                } 
+                // 处理链接行（含逗号）
+                else if (trimmedLine.includes(',')) {
+                    // 只按第一个逗号分割，避免网址中包含逗号
+                    const [siteName, ...urlParts] = trimmedLine.split(',');
+                    const siteUrl = urlParts.join(',').trim();
+
+                    // 简单验证网址格式，如果没有协议头，添加http://
+                    let formattedUrl = siteUrl;
+                    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+                        formattedUrl = 'http://' + formattedUrl;
+                    }
+
+                    // 添加到当前分类
+                    if (!navigationData[currentCategory]) {
+                        navigationData[currentCategory] = [];
+                    }
+                    navigationData[currentCategory].push({
+                        name: siteName.trim(),
+                        url: formattedUrl,
+                        originalUrl: siteUrl
+                    });
+                }
+            });
+
+            return navigationData;
+        }
+
+        // 渲染分类列表
+        function renderCategories() {
+            categoryList.innerHTML = '';
+            const categories = Object.keys(navigationData);
+            
+            if (categories.length === 0) {
+                const emptyItem = document.createElement('li');
+                emptyItem.innerHTML = `<p class="text-gray-400 px-3 py-2">未找到分类数据</p>`;
+                categoryList.appendChild(emptyItem);
+                return;
+            }
+            
+            // 为每个分类创建列表项
+            categories.forEach(category => {
+                const siteCount = navigationData[category].length;
+                const listItem = document.createElement('li');
+                
+                listItem.innerHTML = `
+                    <button class="category-item w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 transition-colors flex justify-between items-center" 
+                            data-category="${category}">
+                        <span>${category}</span>
+                        <span class="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">${siteCount}</span>
+                    </button>
+                `;
+                
+                categoryList.appendChild(listItem);
+                
+                // 添加点击事件
+                listItem.querySelector('button').addEventListener('click', () => {
+                    selectCategory(category);
+                });
+            });
+            
+            // 默认选中第一个分类
+            if (categories.length > 0) {
+                selectCategory(categories[0]);
+            }
+        }
+
+        // 选择分类，显示对应的网站列表
+        function selectCategory(category) {
+            // 更新当前分类
+            currentCategory = category;
+            
+            // 更新分类按钮样式
+            document.querySelectorAll('.category-item').forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('category-active');
+                } else {
+                    btn.classList.remove('category-active');
+                }
+            });
+            
+            // 渲染网站列表
+            renderSites(category);
+        }
+
+        // 渲染网站列表
+        function renderSites(category) {
+            const sites = navigationData[category] || [];
+            
+            if (sites.length === 0) {
+                siteListContainer.innerHTML = `
+                    <div class="text-center py-10 text-gray-400">
+                        <p>该分类下没有网站数据</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 创建网站列表
+            let html = `
+                <div class="mb-4 pb-2 border-b border-gray-100">
+                    <h2 class="font-semibold text-lg">
+                        <i class="fa fa-globe text-primary mr-2"></i>${category}
+                        <span class="text-sm font-normal text-gray-500 ml-2">(${sites.length}个网站)</span>
+                    </h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            `;
+            
+            sites.forEach(site => {
+                // 检查是否自动添加了http://
+                const isAutoProtocol = site.url.startsWith('http://') && !site.originalUrl.startsWith('http://') && !site.originalUrl.startsWith('https://');
+                
+                html += `
+                    <a href="${site.url}" target="_blank" class="group">
+                        <div class="border border-gray-200 rounded-lg p-3 hover:border-primary/50 hover:shadow-md transition-all duration-300 flex items-center">
+                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-3 group-hover:bg-primary group-hover:text-white transition-colors">
+                                <i class="fa fa-link"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-medium text-gray-800 truncate">${site.name}</h3>
+                                <p class="text-xs text-gray-500 mt-0.5 truncate">
+                                    ${site.url}
+                                    ${isAutoProtocol ? '<span class="text-primary">(自动补全协议头)</span>' : ''}
+                                </p>
+                            </div>
+                            <i class="fa fa-external-link text-gray-400 group-hover:text-primary transition-colors ml-2"></i>
+                        </div>
+                    </a>
+                `;
+            });
+            
+            html += `</div>`;
+            siteListContainer.innerHTML = html;
+        }
+
+        // 显示错误信息
+        function showError(message) {
+            errorText.textContent = message;
+            errorMsg.classList.remove('hidden');
+            navContainer.classList.add('hidden');
+        }
+
+        // 隐藏错误信息
+        function hideError() {
+            errorMsg.classList.add('hidden');
+        }
+
+        // 显示加载状态
+        function showLoading() {
+            loading.classList.remove('hidden');
+            navContainer.classList.add('hidden');
+        }
+
+        // 隐藏加载状态
+        function hideLoading() {
+            loading.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

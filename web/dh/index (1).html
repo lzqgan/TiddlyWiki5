@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址导航</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+        }
+    </style>
+    
+    <!-- 引入字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-inter text-dark min-h-screen">
+    <!-- 顶部导航栏 -->
+    <header class="bg-gradient-to-r from-primary to-blue-600 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fa fa-compass text-2xl mr-3"></i>
+                    <h1 class="text-2xl font-bold">网址导航</h1>
+                </div>
+                
+                <!-- 搜索框 -->
+                <div class="w-full md:w-1/3 relative">
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        placeholder="搜索网站..." 
+                        class="w-full py-2 px-4 pr-10 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-800"
+                    >
+                    <i class="fa fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 状态提示 -->
+        <div id="status-message" class="hidden mb-6 p-4 rounded-lg bg-blue-50 text-blue-800 border border-blue-200">
+            <i class="fa fa-info-circle mr-2"></i>
+            <span id="status-text">加载中...</span>
+        </div>
+        
+        <!-- 分类导航区 -->
+        <div id="categories-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 内容将通过JavaScript动态生成 -->
+        </div>
+        
+        <!-- 加载中动画 -->
+        <div id="loading" class="flex justify-center items-center py-16">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+        
+        <!-- 空状态 -->
+        <div id="empty-state" class="hidden flex flex-col py-20 items-center justify-center">
+            <div class="text-center">
+                <i class="fa fa-folder-open-o text-5xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">没有找到任何网站数据</p>
+            </div>
+        </div>
+        
+        <!-- 搜索无结果 -->
+        <div id="no-results" class="hidden flex justify-center py-20">
+            <p class="text-gray-500">没有找到匹配的网站</p>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2023 网址导航 | 数据来源于 sites.txt</p>
+            <p class="text-sm text-gray-400 mt-2">使用 Tailwind CSS 构建</p>
+        </div>
+    </footer>
+    
+    <script>
+        // 存储所有网站数据
+        let allSites = {};
+        let filteredSites = {};
+        
+        // DOM 加载完成后执行
+        document.addEventListener('DOMContentLoaded', () => {
+            // 读取并解析txt文件
+            loadSitesFromFile('sites.txt');
+            
+            // 搜索功能
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', handleSearch);
+        });
+        
+        // 从txt文件加载网站数据
+        function loadSitesFromFile(filePath) {
+            showStatus('正在读取网站数据...');
+            
+            fetch(filePath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('文件未找到或无法加载');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    parseSitesData(data);
+                    renderCategories(allSites);
+                    hideLoading();
+                    hideStatus();
+                })
+                .catch(error => {
+                    console.error('加载文件出错:', error);
+                    hideLoading();
+                    showStatus('无法加载数据: ' + error.message, 'error');
+                    showEmptyState();
+                });
+        }
+        
+        // 解析网站数据
+        function parseSitesData(data) {
+            const lines = data.split('\n');
+            let currentCategory = '未分类';
+            
+            lines.forEach(line => {
+                // 去除首尾空白
+                line = line.trim();
+                
+                // 跳过空行
+                if (line === '') return;
+                
+                // 处理分类行 (以#开头)
+                if (line.startsWith('#')) {
+                    currentCategory = line.substring(1).trim();
+                    // 初始化分类
+                    if (!allSites[currentCategory]) {
+                        allSites[currentCategory] = [];
+                    }
+                } else {
+                    // 处理网站行 (格式: 网站名,网址)
+                    const [name, url] = line.split(',').map(item => item.trim());
+                    if (name && url) {
+                        // 确保URL格式正确
+                        const formattedUrl = url.startsWith('http://') || url.startsWith('https://') 
+                            ? url 
+                            : 'https://' + url;
+                            
+                        if (!allSites[currentCategory]) {
+                            allSites[currentCategory] = [];
+                        }
+                        
+                        allSites[currentCategory].push({
+                            name,
+                            url: formattedUrl
+                        });
+                    }
+                }
+            });
+            
+            // 如果没有数据，显示空状态
+            if (Object.keys(allSites).length === 0) {
+                showEmptyState();
+            }
+        }
+        
+        // 渲染分类和网站
+        function renderCategories(sitesData) {
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+            
+            // 如果没有数据，显示无结果
+            if (Object.keys(sitesData).length === 0) {
+                showNoResults();
+                return;
+            }
+            
+            hideNoResults();
+            
+            // 遍历每个分类
+            Object.keys(sitesData).forEach(category => {
+                const sites = sitesData[category];
+                
+                // 创建分类卡片
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'bg-white rounded-xl shadow-lg p-6 card-hover';
+                
+                // 分类标题
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.className = 'text-xl font-bold mb-4 flex items-center';
+                categoryTitle.innerHTML = `<i class="fa fa-folder-open text-primary mr-2"></i>${category}`;
+                categoryCard.appendChild(categoryTitle);
+                
+                // 网站列表
+                const sitesList = document.createElement('div');
+                sitesList.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+                
+                // 添加网站链接
+                sites.forEach(site => {
+                    const siteLink = document.createElement('a');
+                    siteLink.href = site.url;
+                    siteLink.target = '_blank';
+                    siteLink.className = 'flex items items-blue-50 hover:bg-blue-100 p-3 rounded-lg flex items-center transition-all duration-200 flex items-center';
+                    siteLink.innerHTML = `
+                        <i class="fa fa-external-link text-primary mr-2"></i>
+                        <span>${site.name}</span>
+                    `;
+                    sitesList.appendChild(siteLink);
+                });
+                
+                categoryCard.appendChild(sitesList);
+                container.appendChild(categoryCard);
+            });
+        }
+        
+        // 处理搜索功能
+        function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            // 如果搜索为空，显示所有网站
+            if (searchTerm === '') {
+                renderCategories(allSites);
+                return;
+            }
+            
+            // 过滤网站
+            filteredSites = {};
+            
+            Object.keys(allSites).forEach(category => {
+                const matchingSites = allSites[category].filter(site => 
+                    site.name.toLowerCase().includes(searchTerm) || 
+                    site.url.toLowerCase().includes(searchTerm)
+                );
+                
+                if (matchingSites.length > 0) {
+                    filteredSites[category] = matchingSites;
+                }
+            });
+            
+            // 渲染过滤后的结果
+            renderCategories(filteredSites);
+        }
+        
+        // 显示状态消息
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status-message');
+            const statusText = document.getElementById('status-text');
+            
+            statusText.textContent = message;
+            
+            // 设置状态样式
+            if (type === 'error') {
+                statusEl.className = 'mb-6 p-4 rounded-lg bg-red-50 text-red-800 border border-red-200';
+                statusEl.innerHTML = `<i class="fa fa-exclamation-circle mr-2"></i><span>${message}</span>`;
+            } else {
+                statusEl.className = 'mb-6 p-4 rounded-lg bg-blue-50 text-blue-800 border border-blue-200';
+                statusEl.innerHTML = `<i class="fa fa-info-circle mr-2"></i><span>${message}</span>`;
+            }
+            
+            statusEl.classList.remove('hidden');
+        }
+        
+        // 隐藏状态消息
+        function hideStatus() {
+            document.getElementById('status-message').classList.add('hidden');
+        }
+        
+        // 隐藏加载动画
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+        
+        // 显示空状态
+        function showEmptyState() {
+            document.getElementById('empty-state').classList.remove('hidden');
+        }
+        
+        // 显示无结果状态
+        function showNoResults() {
+            document.getElementById('no-results').classList.remove('hidden');
+        }
+        
+        // 隐藏无结果状态
+        function hideNoResults() {
+            document.getElementById('no-results').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

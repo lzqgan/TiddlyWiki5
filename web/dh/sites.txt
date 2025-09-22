@@ -1,0 +1,15 @@
+# 搜索引擎
+谷歌,https://google.com
+
+## 中文搜索
+百度,baidu.com
+搜狗,sogou.com
+
+# 社交网络
+## 国内社交
+微信,https://weixin.qq.com
+微博,weibo.com
+
+## 国际社交
+Facebook,facebook.com
+Twitter,twitter.com
