@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>链接格式转换工具增强版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        header {
+            background: #4a6bdf;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        h2 {
+            color: #4a6bdf;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        .input-output-container {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .input-area, .output-area {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .textarea-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 300px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: monospace;
+            resize: none;
+            font-size: 14px;
+            overflow: auto;
+            white-space: nowrap;
+        }
+        
+        .format-selection {
+            background: #e8f4fc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .format-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .format-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 5px;
+            background: #f0f5ff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            text-align: center;
+        }
+        
+        .format-option label:hover {
+            background: #e0ebff;
+        }
+        
+        .format-option input {
+            margin-right: 5px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #4a6bdf;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        button:hover {
+            background: #3a5bc7;
+            transform: translateY(-2px);
+        }
+        
+        .output-container {
+            background: #2c3e50;
+            border-radius: 8px;
+            overflow: auto;
+            padding: 15px;
+            /* 确保高度固定不变 */
+            min-height: 300px;
+            max-width: 500px;
+            resize: none;
+            white-space: nowrap;
+        }
+        
+        .output {
+            color: white;
+            font-family: monospace;
+            white-space: pre;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+            overflow-x: auto;
+            width: 100%;
+        }
+        
+        .output-line {
+            display: block;
+            white-space: nowrap;
+            overflow-x: auto;
+            margin-bottom: 8px;
+        }
+        
+        xmp {
+            margin: 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            color: white;
+        }
+        
+        .example {
+            background: #e8f4fc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .example h3 {
+            color: #4a6bdf;
+            margin-bottom: 10px;
+        }
+        
+        .detected-format {
+            margin-top: 10px;
+            padding: 10px;
+            background: #e1f5fe;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .format-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .format-example {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        .format-example h4 {
+            color: #4a6bdf;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: white;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 900px) {
+            .input-output-container {
+                flex-direction: column;
+            }
+            
+            .format-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .format-examples {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>链接格式转换工具增强版</h1>
+            <p class="description">自动检测输入格式并在多种输出格式之间转换</p>
+        </header>
+        
+        <div class="content">
+            <div class="section">
+                <h2>转换工具</h2>
+                <div class="input-output-container">
+                    <div class="input-area">
+                        <h3>输入链接</h3>
+
+                        <div class="textarea-container">
+                            <textarea id="inputText" placeholder="例如：
+谷歌搜索,https://www.google.com
+[维基百科](https://www.wikipedia.org)
+[[谷歌搜索|https://www.google.com]]
+[[https://github.com|GitHub]]
+https://example.com|示例网站
+&lt;a href=&quot;https://example.org&quot;&gt;示例网站&lt;/a&gt;"></textarea>
+                        </div>
+                        <p>输入任意格式的链接（每行一个）：</p>
+                        <div class="detected-format" id="detectedFormat">
+                            检测到的格式将显示在这里
+                        </div>
+                    </div>
+                    
+                    <div class="output-area">
+                        <h3>输出结果</h3>
+                        <div class="output-container">
+                            <xmp id="output">转换结果将显示在这里...</xmp>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="format-selection">
+                    <h3>选择输出格式</h3>
+                    <div class="format-options">
+                        <div class="format-option">
+                            <label>
+                                <input type="radio" name="format" value="plain" checked>
+                                普通
+                            </label>
+                        </div>
+                        <div class="format-option">
+                            <label>
+                                <input type="radio" name="format" value="tiddlywiki">
+                                太微
+                            </label>
+                        </div>
+                        <div class="format-option">
+                            <label>
+                                <input type="radio" name="format" value="markdown">
+                                Markdown
+                            </label>
+                        </div>
+                        <div class="format-option">
+                            <label>
+                                <input type="radio" name="format" value="dokuwiki">
+                                DokuWiki
+                            </label>
+                        </div>
+                        <div class="format-option">
+                            <label>
+                                <input type="radio" name="format" value="onetab">
+                                OneTab
+                            </label>
+                        </div>
+                        <div class="format-option">
+                            <label>
+                                <input type="radio" name="format" value="html">
+                                HTML
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="buttons">
+                    <button id="convertBtn">转换格式</button>
+                    <button id="copyBtn">复制到剪贴板</button>
+                    <button id="clearBtn">清空输入</button>
+                </div>
+            </div>
+            
+            <div class="section example">
+                <h2>格式说明</h2>
+                <div class="format-examples">
+                    <div class="format-example">
+                        <h4>普通</h4>
+                        <p>站点名称,网址</p>
+                        <p><em>示例: 谷歌搜索,https://www.google.com</em></p>
+                    </div>
+                    <div class="format-example">
+                        <h4>Markdown</h4>
+                        <p>[站点名称](网址)</p>
+                        <p><em>示例: [谷歌搜索](https://www.google.com)</em></p>
+                    </div>
+                    <div class="format-example">
+                        <h4>太微</h4>
+                        <p>[[站点名称|网址]]</p>
+                        <p><em>示例: [[谷歌搜索|https://www.google.com]]</em></p>
+                    </div>
+                    <div class="format-example">
+                        <h4>DokuWiki</h4>
+                        <p>[[网址|站点名称]]</p>
+                        <p><em>示例: [[https://www.google.com|谷歌搜索]]</em></p>
+                    </div>
+                    <div class="format-example">
+                        <h4>OneTab</h4>
+                        <p>网址|站点名称</p>
+                        <p><em>示例: https://www.google.com|谷歌搜索</em></p>
+                    </div>
+                    <div class="format-example">
+                        <h4>HTML</h4>
+                        <p>&lt;a href="网址"&gt;站点名称&lt;/a&gt;</p>
+                        <p><em>示例: &lt;a href="https://www.google.com"&gt;谷歌搜索&lt;/a&gt;</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 链接格式转换工具增强版 | 使用JavaScript编写</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const outputElement = document.getElementById('output');
+            const convertBtn = document.getElementById('convertBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const formatRadios = document.querySelectorAll('input[name="format"]');
+            const detectedFormatElement = document.getElementById('detectedFormat');
+            
+            // 检测输入格式的函数
+            function detectFormat(text) {
+                if (!text.trim()) return "未知";
+                
+                const lines = text.split('\n').filter(line => line.trim());
+                if (lines.length === 0) return "未知";
+                
+                // 检查第一行的格式
+                const line = lines[0].trim();
+                
+                if (line.includes('<a href="') && line.includes('</a>')) {
+                    return "HTML";
+                } else if (line.includes('[') && line.includes('](') && line.includes(')')) {
+                    return "Markdown";
+                } else if (line.startsWith('[[') && line.includes('|') && line.endsWith(']]')) {
+                    // 区分太微和DokuWiki格式
+                    const innerContent = line.substring(2, line.length - 2);
+                    const parts = innerContent.split('|');
+                    if (parts.length === 2) {
+                        // 检查第一部分是否是URL
+                        const firstPart = parts[0].trim();
+                        if (firstPart.startsWith('http://') || firstPart.startsWith('https://')) {
+                            return "DokuWiki";
+                        } else {
+                            return "太微";
+                        }
+                    }
+                    return "未知";
+                } else if (line.includes('|') && !line.includes('[[') && !line.includes(']]')) {
+                    return "OneTab";
+                } else if (line.includes(',') && line.split(',').length === 2) {
+                    return "普通";
+                } else {
+                    return "未知";
+                }
+            }
+            
+            // 解析输入内容
+            function parseInput(text) {
+                const lines = text.split('\n');
+                const result = [];
+                
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    
+                    let title = '', url = '';
+                    const trimmedLine = line.trim();
+                    
+                    // 尝试解析不同格式
+                    if (trimmedLine.includes('<a href="') && trimmedLine.includes('</a>')) {
+                        // HTML格式: <a href="URL">标题</a>
+                        const match = trimmedLine.match(/<a href="([^"]+)">([^<]+)<\/a>/);
+                        if (match && match.length >= 3) {
+                            url = match[1];
+                            title = match[2];
+                        }
+                    } else if (trimmedLine.includes('[') && trimmedLine.includes('](') && trimmedLine.includes(')')) {
+                        // Markdown格式: [标题](URL)
+                        const match = trimmedLine.match(/\[([^\]]+)\]\(([^)]+)\)/);
+                        if (match && match.length >= 3) {
+                            title = match[1];
+                            url = match[2];
+                        }
+                    } else if (trimmedLine.startsWith('[[') && trimmedLine.includes('|') && trimmedLine.endsWith(']]')) {
+                        // 区分太微和DokuWiki格式
+                        const innerContent = trimmedLine.substring(2, trimmedLine.length - 2);
+                        const parts = innerContent.split('|');
+                        if (parts.length === 2) {
+                            const firstPart = parts[0].trim();
+                            const secondPart = parts[1].trim();
+                            
+                            // 如果第一部分是URL，则是DokuWiki格式
+                            if (firstPart.startsWith('http://') || firstPart.startsWith('https://')) {
+                                url = firstPart;
+                                title = secondPart;
+                            } else {
+                                // 否则是太微格式
+                                title = firstPart;
+                                url = secondPart;
+                            }
+                        }
+                    } else if (trimmedLine.includes('|') && !trimmedLine.includes('[[') && !trimmedLine.includes(']]')) {
+                        // OneTab格式: URL|标题
+                        const parts = trimmedLine.split('|');
+                        if (parts.length >= 2) {
+                            url = parts[0].trim();
+                            title = parts.slice(1).join('|').trim();
+                        }
+                    } else if (trimmedLine.includes(',')) {
+                        // 普通格式: 标题,URL
+                        const parts = trimmedLine.split(',');
+                        if (parts.length >= 2) {
+                            title = parts[0].trim();
+                            url = parts.slice(1).join(',').trim();
+                        }
+                    } else {
+                        // 无法识别，尝试提取URL
+                        const urlMatch = trimmedLine.match(/(https?:\/\/[^\s]+)/);
+                        if (urlMatch) {
+                            url = urlMatch[0];
+                            title = trimmedLine.replace(url, '').trim() || '无标题';
+                        } else {
+                            title = trimmedLine;
+                            url = '';
+                        }
+                    }
+                    
+                    result.push({ title, url, original: trimmedLine });
+                }
+                
+                return result;
+            }
+            
+            // 转换函数
+            function convertLinks() {
+                const input = inputText.value.trim();
+                if (!input) {
+                    outputElement.textContent = '转换结果将显示在这里...';
+                    return;
+                }
+                
+                // 检测输入格式
+                const detectedFormat = detectFormat(input);
+                detectedFormatElement.textContent = `检测到的输入格式: ${detectedFormat}`;
+                
+                // 解析输入
+                const parsedData = parseInput(input);
+                
+                // 获取选择的输出格式
+                const selectedFormat = document.querySelector('input[name="format"]:checked').value;
+                let outputText = '';
+                
+                for (const item of parsedData) {
+                    const title = item.title || '无标题';
+                    const url = item.url || '';
+                    
+                    if (!url) {
+                        outputText += `无法解析: ${item.original}\n`;
+                        continue;
+                    }
+                    
+                    switch(selectedFormat) {
+                        case 'plain':
+                            outputText += `${title}, ${url}\n`;
+                            break;
+                        case 'markdown':
+                            outputText += `[${title}](${url})\n`;
+                            break;
+                        case 'tiddlywiki':
+                            outputText += `[[${title}|${url}]]\n`;
+                            break;
+                        case 'dokuwiki':
+                            outputText += `[[${url}|${title}]]\n`;
+                            break;
+                        case 'onetab':
+                            outputText += `${url}|${title}\n`;
+                            break;
+                        case 'html':
+                            outputText += `<a href="${url}">${title}</a>\n`;
+                            break;
+                    }
+                }
+                
+                outputElement.textContent = outputText;
+            }
+            
+            // 初始化
+            inputText.value = "谷歌搜索,https://www.google.com\n[维基百科](https://www.wikipedia.org)\n[[谷歌搜索|https://www.google.com]]\n[[https://github.com|GitHub]]\nhttps://example.com|示例网站";
+            convertLinks();
+            
+            // 添加事件监听器
+            convertBtn.addEventListener('click', convertLinks);
+            
+            formatRadios.forEach(radio => {
+                radio.addEventListener('change', convertLinks);
+            });
+            
+            inputText.addEventListener('input', convertLinks);
+            
+            copyBtn.addEventListener('click', function() {
+                const outputText = outputElement.textContent;
+                if (!outputText || outputText === '转换结果将显示在这里...') {
+                    alert('请先输入一些链接！');
+                    return;
+                }
+                
+                const textarea = document.createElement('textarea');
+                textarea.value = outputText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                alert('已复制到剪贴板！');
+            });
+            
+            clearBtn.addEventListener('click', function() {
+                inputText.value = '';
+                outputElement.textContent = '转换结果将显示在这里...';
+                detectedFormatElement.textContent = '检测到的格式将显示在这里';
+            });
+        });
+    </script>
+</body>
+</html>

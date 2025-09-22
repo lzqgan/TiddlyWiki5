@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML代码输入</title>
+  <style>
+    body {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+ 
+    .editor {
+      flex: 1;
+      background-color: #f8f8f8;
+      padding: 20px;
+      border-right: 1px solid #ccc;
+    }
+ 
+    .result {
+      flex: 1;
+      padding: 20px;
+    }
+ 
+    textarea {
+      width: 100%;
+      height: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      resize: none;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="editor">
+    <textarea id="code-input" placeholder="在这里输入HTML代码"></textarea>
+  </div>
+  <div class="result">
+    <iframe id="preview" frameborder="0" width="100%" height="100%"></iframe>
+  </div>
+ 
+  <script>
+    // 获取DOM元素
+    var codeInput = document.getElementById('code-input');
+    var preview = document.getElementById('preview');
+ 
+    // 监听输入框的变化
+    codeInput.addEventListener('input', function() {
+      var code = codeInput.value;
+      preview.contentDocument.documentElement.innerHTML = code;
+    });
+  </script>
+</body>
+</html>

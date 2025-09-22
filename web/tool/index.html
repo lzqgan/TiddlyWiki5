@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具集合</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 28px;
+        }
+        
+        .tools-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            list-style: none;
+        }
+        
+        .tools-list li {
+            text-align: center;
+        }
+        
+        .tools-list a {
+            display: block;
+            padding: 15px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .tools-list a:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tools-list a:nth-child(2n) {
+            background-color: #2ecc71;
+        }
+        
+        .tools-list a:nth-child(2n):hover {
+            background-color: #27ae60;
+        }
+        
+        .tools-list a:nth-child(3n) {
+            background-color: #e74c3c;
+        }
+        
+        .tools-list a:nth-child(3n):hover {
+            background-color: #c0392b;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>工具集合</h1>
+        <ul class="tools-list">
+            <li><a href="html代码直接演示.html">html演示</a></li>
+            <li><a href="链接转换.html">链接转换</a></li>
+            <li><a href="/tuji/index.html">图集资料</a></li>
+            <li><a href="文本框复制.html">文本框复制</a></li>
+        </ul>
+        <div class="footer">
+            <p>便捷工具，提升效率</p>
+        </div>
+    </div>
+</body>
+</html>

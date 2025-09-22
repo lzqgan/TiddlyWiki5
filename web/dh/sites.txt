@@ -13,3 +13,8 @@
 ## 国际社交
 Facebook,facebook.com
 Twitter,twitter.com
+
+# 我的工具
+html演示,../tool/html代码直接演示.html
+链接转换,../tool/链接转换.html
+文本框复制,../tool/文本框复制.html
