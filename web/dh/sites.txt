@@ -125,6 +125,9 @@
 ## 番号资源库
 
 # 我的工具
-    html演示,../tool/html代码直接演示.html
-    链接转换,../tool/链接转换.html
-    文本框复制,../tool/文本框复制.html
+    工具合集,http://localhost/web/tool/index.html
+    html演示,http://localhost/web/tool/html代码直接演示.html
+    链接转换,http://localhost/web/tool/链接转换.html
+   文本框复制,http://localhost/web/tool/文本框复制.html
+   计算器,http://localhost/web/tool/cal.html
+    测试,lzqgan.top

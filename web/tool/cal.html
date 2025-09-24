@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>cal</title>
+    <style>
+        span.title {
+            font-size: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2196F3;
+        }
+
+        span.feature {
+            font-size: 15px;
+            display: inline-block;
+            margin-left: 5px;
+            color: #2c9943;
+            cursor: pointer;
+        }
+
+        span.feature:hover {
+            color: #62f181;
+        }
+
+        #equation,
+        #result,
+        #history {
+            width: 100%
+        }
+
+        input,
+        div {
+            width: 97%;
+            font-size: 17px;
+            font-family: consolas;
+
+        }
+
+        input {
+            height: 30px;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-bottom: 1px solid #dbdbdb;
+            outline: none;
+            margin-bottom: 20px;
+        }
+
+        input:hover {
+            border-bottom: 1px solid #2196F3;
+            transition: 0.5s;
+        }
+
+        pre {
+            padding: 2px 10px;
+            font-family: consolas;
+            white-space: pre-wrap;
+            word-wrap:break-word;
+            word-break:break-all; 
+        }
+    </style>
+</head>
+
+<body>
+    <div id="equation">
+        <span class="title">公式</span>
+        <span class="feature" onclick="help()">HELP</span><br>
+        <input type="text" placeholder="在此处输入计算的公式">
+    </div>
+    <div id="result" onclick="copy()">
+        <span class="title">结果</span>
+        <span class="feature" onclick="copy()">COPY</span>
+        <span class="feature" onclick="hex()">HEX</span>
+        <span class="feature" onclick="bin()">BIN</span>
+        <input type="text" readonly>
+    </div>
+    <div id="history">
+        <span class="title">历史</span><br>
+        <pre></pre>
+    </div>
+    <script>
+        function math(s) {
+            var f = Object.getOwnPropertyNames(Math).join('|');
+            var re = new RegExp("(" + f + ")", "g");
+            return s.replace(re, "Math.$1").replace(/(\d+)\*\*(\d+)/g, 'Math.pow($1, $2)')
+        }
+
+        function help() {
+            var s = '+ 加\n- 减\n* 乘\n\\ 除\n^ 异或\n** 求幂\n% 求余\n';
+            var c =
+                'E 返回算术常量 e，即自然对数的底数（约等于2.718）\nLN2 返回 2 的自然对数（约等于0.693）\nLN10 返回 10 的自然对数（约等于2.302）\nLOG2E 返回以 2 为底的 e 的对数（约等于 1.414）\nLOG10E 返回以 10 为底的 e 的对数（约等于0.434）\nPI 返回圆周率（约等于3.14159）\nSQRT1_2 返回返回 2 的平方根的倒数（约等于 0.707）\nSQRT2 返回 2 的平方根（约等于 1.414）';
+            var f =
+                'abs(x) 返回 x 的绝对值\nacos(x) 返回 x 的反余弦值\nasin(x) 返回 x 的反正弦值\natan(x) 以介于 -PI/2 与 PI/2 弧度之间的数值来返回 x 的反正切值\natan2(y,x) 返回从 x 轴到点 (x,y) 的角度\nceil(x) 对数进行上舍入\ncos(x) 返回数的余弦\nexp(x) 返回 Ex 的指数\nfloor(x) 对 x 进行下舍入\nlog(x) 返回数的自然对数（底为e）\nmax(x,y,z,...,n) 返回 x,y,z,...,n 中的最高值\nmin(x,y,z,...,n) 返回 x,y,z,...,n中的最低值\npow(x,y) 返回 x 的 y 次幂\nrandom() 返回 0 ~ 1 之间的随机数\nround(x) 四舍五入\nsin(x) 返回数的正弦\nsqrt(x) 返回数的平方根\ntan(x) 返回角的正切\n';
+            alert(s + f + c);
+        }
+        document.querySelector('#equation input').focus();
+        document.onkeydown = function (e) {
+            if (e.keyCode == 13) {
+                var result = eval(math(document.querySelector('input').value)).toFixed(10);
+                if(!(result.search('e')+1)){
+                    result = result.replace(/(\.){0,1}0+$/, '');
+                }
+                document.querySelector('#result input').value = result;
+                updateHistory();
+            }
+        }
+
+
+        function copy() {
+            var result = document.querySelector("#result input");
+            result.select();
+            document.execCommand("Copy");
+        }
+
+        function hex() {
+            var result = document.querySelector('#result input').value;
+            if (result.slice(0, 2) == '0b') {
+                document.querySelector('#result input').value = '0x' + parseInt(result.slice(2), 2).toString(16);
+            } else {
+                document.querySelector('#result input').value = '0x' + parseInt(result).toString(16);
+            }
+            updateHistory();
+        }
+
+        function bin() {
+            var result = document.querySelector('#result input').value;
+            document.querySelector('#result input').value = '0b' + parseInt(result).toString(2);
+            updateHistory();
+        }
+
+        function updateHistory() {
+            var equation = document.querySelector('input').value;
+            var result = document.querySelector('#result input').value;
+            var history = document.querySelector('#history pre').innerHTML;
+            document.querySelector('#history pre').innerHTML = equation + "=" + result + '<br>' + history
+        }
+    </script>
+</body>
+
+</html>
