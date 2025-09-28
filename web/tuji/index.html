@@ -1,102 +1,697 @@
 <!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图集</title>
+    <title>工程做法图集阅读器 - 国标与中南标</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+        }
+
+        body {
+            background-color: #2c3e50;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航栏 - 紧凑设计 */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background-color: #1a2530;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .top-nav h1 {
+            font-size: 18px;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-right: 15px;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .nav-controls a {
+            padding: 6px 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .nav-controls a:hover {
+            background-color: #2980b9;
+        }
+
+        /* 标准选择器 - 紧凑设计 */
+        .standard-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+
+        .standard-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-btn {
+            padding: 6px 10px;
+            background-color: #2c3e50;
+            color: white;
+            border: 1px solid #3498db;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 100px;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .dropdown-btn::after {
+            content: "▼";
+            font-size: 10px;
+            margin-left: 8px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #2c3e50;
+            min-width: 180px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #3498db;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 10px 12px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s;
+            font-size: 13px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #3498db;
+        }
+
+        .standard-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* 侧边目录 */
+        .sidebar-toggle {
+            position: fixed;
+            left: 15px;
+            bottom: 15px;
+            z-index: 900;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #1a2530;
+            color: white;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-size: 18px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #sidebar {
+            position: fixed;
+            left: -280px;
+            top: 50px;
+            bottom: 0;
+            width: 280px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            z-index: 800;
+            padding: 15px 0;
+        }
+
+        #sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 0 15px 0px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        /* 目录样式 */
+        #outline ul {
+            list-style: none;
+        }
+
+        #outline li {
+            border-bottom: 1px solid #34495e;
+        }
+
+        #outline a {
+            display: block;
+            padding: 1px 15px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+            font-size: 13px;
+        }
+
+        #outline a:hover {
+            background-color: #34495e;
+            padding-left: 20px;
+        }
+
+        #outline a.l {
+            padding-left: 15px;
+        }
+
+        #outline a.l::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 5px;
+            background-color: #3498db;
+            border-radius: 50%;
+        }
+
+        #outline ul ul {
+            padding: 0;
+            background-color: #243342;
+        }
+
+        #outline ul ul a {
+            padding-left: 30px;
+            font-size: 12px;
+        }
+
+        #outline ul ul a::before {
+            left: 20px;
+            background-color: #9b59b6;
+        }
+
+        /* 主内容区 */
+        #page-container {
+            margin-top: 50px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .page {
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .page img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .page-number {
+            text-align: center;
+            padding: 8px;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-size: 13px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        /* 页码导航 */
+        .page-nav {
+            position: fixed;
+            right: 15px;
+            bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 900;
+        }
+
+        .page-nav a {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #1a2530;
+            color: white;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        .page-nav a:hover {
+            background-color: #3498db;
+        }
+
+        /* 当前页码指示器 */
+        .current-page-indicator {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 15px;
+            background-color: rgba(26, 37, 48, 0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 900;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 0 10px;
+            }
+            
+            .top-nav h1 {
+                font-size: 16px;
+                margin-right: 10px;
+            }
+
+            .nav-controls a {
+                padding: 5px 8px;
+                font-size: 13px;
+            }
+
+            .page {
+                border-radius: 0;
+            }
+            
+            .standard-selector {
+                gap: 8px;
+            }
+            
+            .dropdown-btn {
+                min-width: 90px;
+                font-size: 13px;
+                padding: 5px 8px;
+            }
+            
+            .dropdown-content {
+                min-width: 160px;
+            }
+            
+            .dropdown-content a {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .top-nav h1 {
+                font-size: 14px;
+            }
+            
+            .standard-selector {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .dropdown-btn {
+                min-width: 80px;
+                font-size: 12px;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #808080;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: #243342;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #34495e;
+        }
+
+        /* 加载提示 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 18px;
+        }
+
+        /* 图片错误处理 */
+        .image-error {
+            height: 500px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 16px;
+        }
+        
+        .image-error .error-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        /* 模拟图片占位符 */
+        .placeholder-image {
+            height: 500px;
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    <ul>
-  <li><a href="#home" class="active">主页</a></li>
-  <div class="dropdown">
-     <a href="#" class="dropbtn">中南标</a>
-     <div class="dropdown-content">
-      <a target="iframe" href="15ZJ001：建筑构造用料做法.html">15ZJ001</a>
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+        <div style="display: flex; align-items: center; flex-wrap: nowrap;">
+            <h1>工程做法图集阅读器</h1>
+        </div>
+        <div class="nav-controls">
+            <!-- 标准选择器 -->
+            <div class="standard-selector">
+                <!-- 国标下拉菜单 -->
+                <div class="standard-dropdown">
+                    <a href="#" class="dropdown-btn" id="gb-dropdown-btn">国标图集</a>
+                    <div class="dropdown-content" id="gb-dropdown-menu">
+                        <!-- 国标图集选项将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 中南标下拉菜单 -->
+                <div class="standard-dropdown">
+                    <a href="#" class="dropdown-btn" id="zn-dropdown-btn">中南标图集</a>
+                    <div class="dropdown-content" id="zn-dropdown-menu">
+                        <!-- 中南标图集选项将通过JavaScript动态生成 -->
+                    </div>
+                </div>
+            </div>
+            
+            <a href="#" id="toggle-outline">目录</a>
+        </div>
+    </div>
 
-      <a target="iframe" href="图集/楼梯栏杆20ZJ401.html">楼梯栏杆20ZJ401</a>
-      <a target="iframe" href="图集/平屋面15ZJ201.html">平屋面20ZJ401</a>
-     </div>
-   </div>
- 
-  <div class="dropdown">
-     <a href="#" class="dropbtn">国标</a>
-     <div class="dropdown-content">
-      <a target="iframe" href="23J909：工程做法.html">工程做法23J909</a>
-     </div>
-   </div>
- 
-  <div class="dropdown">
-     <a href="#" class="dropbtn">规范图集</a>
-     <div class="dropdown-content">
-   <a target="iframe" href="图集/《建筑设计防火规范》图示18J811-1.html">《建筑设计防火规范》图示18J811-1</a>
-     </div>
-   </div>
- 
-  <li style="float:right" ><a  href="https://www.tujiwang.net.cn/">图集资料网</a></li>
- <!-- 其他导航项... -->
- </ul>
- 
- 
- 
- <nav>
-  <iframe name="iframe" width=100% height=600px  src="23J909：工程做法.html"  frameborder="0"></iframe>
- </nav>
+    <!-- 侧边目录 -->
+    <a href="#" class="sidebar-toggle" id="sidebar-toggle">☰</a>
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <h2>图集目录</h2>
+        </div>
+        <div id="outline">
+            <!-- 目录内容将通过JavaScript动态加载 -->
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div id="page-container">
+        <!-- 页面内容将通过JavaScript动态加载 -->
+        <div class="loading">请从下拉菜单中选择要查看的图集...</div>
+    </div>
+
+    <!-- 页面导航 -->
+    <div class="page-nav">
+        <a href="#" id="page-up">↑</a>
+        <a href="#" id="page-down">↓</a>
+    </div>
+
+    <!-- 当前页码指示 -->
+    <div class="current-page-indicator">
+        当前阅读: <span id="current-page">第 1 页</span>
+    </div>
+
+   <!-- 引入配置文件 -->
+    <script src="图集.js"></script>
+
+    <script>
+        // 主应用程序逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const toggleOutlineBtn = document.getElementById('toggle-outline');
+            const pageUpBtn = document.getElementById('page-up');
+            const pageDownBtn = document.getElementById('page-down');
+            const currentPageSpan = document.getElementById('current-page');
+            const gbDropdownBtn = document.getElementById('gb-dropdown-btn');
+            const znDropdownBtn = document.getElementById('zn-dropdown-btn');
+            const gbDropdownMenu = document.getElementById('gb-dropdown-menu');
+            const znDropdownMenu = document.getElementById('zn-dropdown-menu');
+            
+            // 全局变量
+            let currentContent = null;
+            
+            // 初始化下拉菜单
+            function initDropdowns() {
+                // 初始化国标下拉菜单
+                let gbHtml = '';
+                for (const id in window.contentConfig.GB) {
+                    gbHtml += `<a href="#" data-standard="GB" data-content="${id}">${window.contentConfig.GB[id].name}</a>`;
+                }
+                gbDropdownMenu.innerHTML = gbHtml;
+                
+                // 初始化中南标下拉菜单
+                let znHtml = '';
+                for (const id in window.contentConfig.ZN) {
+                    znHtml += `<a href="#" data-standard="ZN" data-content="${id}">${window.contentConfig.ZN[id].name}</a>`;
+                }
+                znDropdownMenu.innerHTML = znHtml;
+                
+                // 添加下拉菜单项点击事件
+                document.querySelectorAll('.dropdown-content a').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const standard = this.getAttribute('data-standard');
+                        const contentId = this.getAttribute('data-content');
+                        loadContent(standard, contentId);
+                        
+                        // 更新下拉按钮文本
+                        if (standard === 'GB') {
+                            gbDropdownBtn.textContent = this.textContent;
+                        } else {
+                            znDropdownBtn.textContent = this.textContent;
+                        }
+                    });
+                });
+            }
+            
+            // 图片错误处理函数
+            function handleImageError(img) {
+                const pageDiv = img.closest('.page');
+                const pageNumber = pageDiv.querySelector('.page-number').textContent;
+                
+                img.style.display = 'none';
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'image-error';
+                errorDiv.innerHTML = `
+                    <div class="error-icon">⚠️</div>
+                    <div>图片加载失败</div>
+                    <div style="margin-top: 10px; font-size: 14px;">${pageNumber}</div>
+                    <div style="margin-top: 5px; font-size: 12px;">请检查图片URL或网络连接</div>
+                `;
+                
+                pageDiv.insertBefore(errorDiv, pageDiv.querySelector('.page-number'));
+            }
+            
+            // 加载内容函数
+            function loadContent(standard, contentId) {
+                // 更新当前内容
+                currentContent = { standard, contentId };
+                
+                // 显示加载提示
+                const pageContainer = document.getElementById('page-container');
+                pageContainer.innerHTML = '<div class="loading">正在加载内容，请稍候...</div>';
+                
+                // 模拟加载延迟
+                setTimeout(() => {
+                    // 生成目录
+                    const outlineHtml = window.contentConfig[standard][contentId].outline;
+                    document.getElementById('outline').innerHTML = outlineHtml;
+                    
+                    // 生成页面
+                    const config = window.contentConfig[standard][contentId];
+                    const container = document.getElementById('page-container');
+                    let html = '';
+                    
+                    for (let i = 1; i <= config.pages; i++) {
+                        const hexId = i.toString(16);
+                        const imgSrc = `${config.baseUrl}${hexId}.jpg`;
+                        html += `<div class="page" id="pf${hexId}">
+                                    <img src="${imgSrc}" alt="${config.name} - 第 ${i} 页" 
+                                         onerror="handleImageError(this)">
+                                    <div class="page-number">第 ${i} 页</div>
+                                 </div>`;
+                    }
+                    
+                    container.innerHTML = html;
+                    
+                    // 绑定目录链接
+                    bindOutlineLinks();
+                    
+                    // 滚动到顶部
+                    window.scrollTo(0, 0);
+                    updateCurrentPage();
+                }, 500);
+            }
+            
+            // 初始化下拉菜单
+            initDropdowns();
+            
+            // 切换侧边栏
+            sidebarToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                sidebar.classList.toggle('active');
+            });
+
+            toggleOutlineBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                sidebar.classList.toggle('active');
+            });
+
+            // 滚动功能
+            pageUpBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollBy(0, -window.innerHeight * 0.8);
+            });
+
+            pageDownBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollBy(0, window.innerHeight * 0.8);
+            });
+
+            // 更新当前页码显示
+            function updateCurrentPage() {
+                const pages = document.querySelectorAll('.page');
+                let currentPage = 1;
+
+                // 简单的实现：找到最接近视口顶部的页面
+                const viewportMiddle = window.scrollY + (window.innerHeight / 2);
+                pages.forEach((page, index) => {
+                    const rect = page.getBoundingClientRect();
+                    const pageMiddle = rect.top + (rect.height / 2) + window.scrollY;
+
+                    if (Math.abs(viewportMiddle - pageMiddle) < window.innerHeight / 2) {
+                        currentPage = index + 1;
+                    }
+                });
+
+                currentPageSpan.textContent = `第 ${currentPage} 页`;
+            }
+
+            // 监听滚动事件
+            window.addEventListener('scroll', updateCurrentPage);
+            window.addEventListener('resize', updateCurrentPage);
+
+            // 初始更新
+            updateCurrentPage();
+
+            // 目录链接跳转
+            function bindOutlineLinks() {
+                document.querySelectorAll('#outline a').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href');
+                        const targetElement = document.querySelector(targetId);
+
+                        if (targetElement) {
+                            // 关闭侧边栏
+                            sidebar.classList.remove('active');
+
+                            // 滚动到目标位置
+                            const targetPosition = targetElement.offsetTop - 50; // 考虑顶部导航栏高度
+                            window.scrollTo({
+                                top: targetPosition,
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                });
+            }
+            
+            // 将错误处理函数暴露给全局作用域
+            window.handleImageError = handleImageError;
+        });
+    </script>
 </body>
- <style>
-   ul{
-     list-style-type:none;
-     margin:0;
-     padding:0;
-     overflow:hidden;
-     background-color:#333;
-   }
-   
-   li{
-     float:left;
-   }
-   
-   li a, .dropbtn
-   {
-     display:inline-block;
-     color:white;
-     text-align:center;
-     padding:14px 16px;
-     text-decoration:none;
-   }
-   
-   li a:hover, .dropdown:hover, .dropbtn
-   {
-     background-color:#111;
-   }
-   
-   .dropdown
-   {
-     display:inline-block;
-   }
-   
-   .dropdown-content
-   {
-     display:none;
-     position:absolute;
-     background-color:#f9f9f9;
-     min-width:160px;
-     box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);
-   }
-   
-   .dropdown-content a
-   {
-     color:black;
-     padding:12px 16px;
-     text-decoration:none;
-     display:block;
-   }
-   
-   .dropdown-content a:hover {background-color: #f1f1f1}
-   
-   .dropdown:hover .dropdown-content
-   {
-     display:block;
-   }
-   
-   </style>
-
 </html>
