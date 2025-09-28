@@ -131,3 +131,5 @@
    文本框复制,http://localhost/web/tool/文本框复制.html
    计算器,http://localhost/web/tool/cal.html
     测试,lzqgan.top
+# 视频创作工具
+	抖音热点宝,https://douhot.douyin.com/square/hotspot?active_tab=hotspot_all

@@ -52,7 +52,7 @@
 // @downloadURL https://update.sleazyfork.org/scripts/429173/JAV%20%E6%B7%BB%E5%8A%A0%E8%B7%B3%E8%BD%AC%E5%9C%A8%E7%BA%BF%E8%A7%82%E7%9C%8B.user.js
 // @updateURL https://update.sleazyfork.org/scripts/429173/JAV%20%E6%B7%BB%E5%8A%A0%E8%B7%B3%E8%BD%AC%E5%9C%A8%E7%BA%BF%E8%A7%82%E7%9C%8B.meta.js
 // ==/UserScript==
-
+//18AV发布页  https://18av.mm-cg.com
 //添加新网站教程  https://chat.deepseek.com/share/izzzjck26thr4ejkf3
 //截图的pdf https://xget.xi-xu.me/gh/lzqgan/TiddlyWiki5/raw/refs/heads/master/ext/youhou/lzqJAV%E8%B7%B3%E8%BD%AC%E5%9C%A8%E7%BA%BF.pdf
 //fetchType: 可以是 "get" 或 "parser"。
@@ -342,7 +342,8 @@
     {
       name: "18av",
       hostname: "18av.mm-cg.com",
-      url: "https://18av.mm-cg.com/zh/fc_search/all/{{code}}/1.html",
+      //url: "https://18av.mm-cg.com/zh/fc_search/all/{{code}}/1.html",
+      url: "https://mjv007.com/zh/fc_search/all/{{code}}/1.html",
       fetchType: "parser",
       domQuery: { linkQuery: ".posts h3>a[href]", titleQuery: ".posts h3>a[href]" }
     },
